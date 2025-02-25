@@ -13,7 +13,7 @@ using std::shared_ptr;
 class hittable_list : public hittable {
   public:
     std::vector<shared_ptr<hittable>> objects;
-    //用一个objects（std::vector）存储所有可以被射线击中的物体。每个物体都是shared_ptr<hittable>类型，使用shared_ptr管理内存可以避免手动释放内存的问题。
+    //用一个objects（std::vector）存储所有可以被射线击中的物体。每个物体都是shared_ptr<hittable>高级指针类型，使用shared_ptr管理内存可以避免手动释放内存的问题。
 
     hittable_list() {}
     hittable_list(shared_ptr<hittable> object) { add(object); }
@@ -23,7 +23,10 @@ class hittable_list : public hittable {
     void add(shared_ptr<hittable> object) {
         objects.push_back(object);
     }//添加对象到objects
-    //？如何控制个数？如何存储类型
+    //？如何控制个数
+    //不定长指针
+    //？如何存储类型
+    //用triangle集成public hittable，再把triangle放入shared _ptr<>里，就可以实现一个接口不同的实现。
 
     bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override {
         hit_record temp_rec;//保存每次与物体相交的交点信息

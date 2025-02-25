@@ -37,6 +37,7 @@ int main() {
 
     world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
     world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
+    ////由于sphere是继承了hittable类型的，因此sphere类型也能实现定义了hittable的add函数。在这个过程中，它只被当初hittable用，但如果这个函数是在hittable中定义的虚函数，则sphere/triangle可以依照其定义的不同方式实现。
 
     // Camera
 

@@ -4,8 +4,8 @@
 #include "hittable.h"
 #include "vec3.h"
 
-class sphere : public hittable {
-  public:
+class sphere : public hittable/*继承，基于模板进行增改，或是采用不同的实现。public表示公用继承，保留其中的public和private。*/ {
+  public:/*可以从外面访问的*/
     sphere(const point3& center, double radius) : center(center), radius(std::fmax(0,radius)) {}
 
     bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override {
@@ -35,8 +35,8 @@ class sphere : public hittable {
 
         return true;
     }
-
-  private:
+//protected可以用在公用继承后，自己可以访问，继承类可以访问，外部文件访问不了
+  private:/*只在内部提供接口修改，无法在外部文件和继承类文件访问和修改*/
     point3 center;
     double radius;
 };

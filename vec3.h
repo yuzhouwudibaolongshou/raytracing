@@ -24,7 +24,7 @@ class vec3 {
     double& operator[](int i) { return e[i]; }
     //relog: [] to access or change the components of e
 
-    vec3& operator+=(const vec3& v) {
+    vec3& operator+=(const vec3&/*取地址，*取指针值，同箭头的用法（解引用）*/ v) {
         e[0] += v.e[0];
         e[1] += v.e[1];
         e[2] += v.e[2];
