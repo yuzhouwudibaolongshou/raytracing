@@ -23,7 +23,7 @@ class hittable {
   public:
     virtual ~hittable() = default;//这是一个虚析构函数，确保在销毁派生类对象时正确调用析构函数，防止内存泄漏。
 
-    virtual bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const = 0;
+    virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
     //这是一个纯虚函数，基类定义不实现，但所有继承自 hittable 类的派生类必须实现这个函数。
 
     //r：射线（ray）对象，表示当前要进行相交测试的射线。

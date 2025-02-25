@@ -10,7 +10,7 @@
 
 color ray_color(const ray& r, const hittable& world/*这是一个抽象的接口，代表场景中的所有物体集合（hittable_list类）*/) {
     hit_record rec;//交点坐标、法向量normal、t值
-    if (world.hit(r, 0, infinity, rec)/*指定t范围内判定是否相交的函数*/) {
+    if (world.hit(r, interval(0, infinity), rec)/*指定t范围内判定是否相交的函数*/) {
         return 0.5 * (rec.normal/*单位法向量*/ + color(1,1,1));
     }
 

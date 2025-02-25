@@ -28,13 +28,13 @@ class hittable_list : public hittable {
     //？如何存储类型
     //用triangle集成public hittable，再把triangle放入shared _ptr<>里，就可以实现一个接口不同的实现。
 
-    bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override {
+    bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         hit_record temp_rec;//保存每次与物体相交的交点信息
         bool hit_anything = false;//是否被击中
-        auto closest_so_far = ray_tmax;//记录最远物体的t，用以控制只记录最近物体相交的t值
+        auto closest_so_far = ray_t.max;//记录最远物体的t，用以控制只记录最近物体相交的t值
 
         for (const auto& object : objects) {
-            if (object->hit(r, ray_tmin, closest_so_far, temp_rec)) {
+            if (object->hit(r, interval(ray_t.min, closest_so_far), temp_rec)) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
                 rec = temp_rec;
