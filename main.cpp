@@ -6,10 +6,12 @@
 
 #include <fstream>
 
-color ray_color(const ray& r, const hittable& world) {
-    hit_record rec;
-    if (world.hit(r, 0, infinity, rec)) {
-        return 0.5 * (rec.normal + color(1,1,1));
+// 
+
+color ray_color(const ray& r, const hittable& world/*这是一个抽象的接口，代表场景中的所有物体集合（hittable_list类）*/) {
+    hit_record rec;//交点坐标、法向量normal、t值
+    if (world.hit(r, 0, infinity, rec)/*指定t范围内判定是否相交的函数*/) {
+        return 0.5 * (rec.normal/*单位法向量*/ + color(1,1,1));
     }
 
     vec3 unit_direction = unit_vector(r.direction());
@@ -23,7 +25,7 @@ int main() {
     // Image
 
     auto aspect_ratio = 16.0 / 9.0;
-    int image_width = 800;
+    int image_width = 400;
 
     // Calculate the image height, and ensure that it's at least 1.
     int image_height = int(image_width / aspect_ratio);
@@ -39,7 +41,7 @@ int main() {
     // Camera
 
     auto focal_length = 1.0;
-    auto viewport_height = 1.0;
+    auto viewport_height = 2.0;
     auto viewport_width = viewport_height * (double(image_width)/image_height);
     auto camera_center = point3(0, 0, 0);
 
