@@ -10,23 +10,25 @@
 class camera {
   public:
     // Image
-    double aspect_ratio = 16.0 / 9.0;
-    int image_width = 400;
-    int    samples_per_pixel = 10;   // Count of random samples for each pixel
+    double  aspect_ratio = 16.0 / 9.0;
+    int     image_width = 400;
+    int     samples_per_pixel = 10;   // Count of random samples for each pixel
+    int     max_depth         = 10;   // Maximum number of ray bounces into scene
+    double  albedo            = 0.1;  // ρ
 
     void render(const hittable& world) {
         initialize();
 
         std::ofstream ppm;
-    ppm.open("./build/image6.0.ppm");//在第一次向文件输出之前打开文件
-    ppm << "P3" << std::endl << image_width << ' ' << image_height << std::endl << "255" << std::endl;
-    for (int j = 0; j < image_height; j++) {
-        std::cout << "Scanlines remaining: " << (image_height - j) << std::endl;
-        for (int i = 0; i < image_width; i++) {
-            color pixel_color(0,0,0);
+        ppm.open("./build/gray_ball_depthlimit_Lambert_gamma_dark.ppm");//在第一次向文件输出之前打开文件///////////////////////////////////////////////////////////////
+        ppm << "P3" << std::endl << image_width << ' ' << image_height << std::endl << "255" << std::endl;
+        for (int j = 0; j < image_height; j++) {
+            std::cout << "Scanlines remaining: " << (image_height - j) << std::endl;
+            for (int i = 0; i < image_width; i++) {
+                color pixel_color(0,0,0);
                 for (int sample = 0; sample < samples_per_pixel; sample++) {
                     ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world);
                 }
                 write_color(ppm, pixel_samples_scale * pixel_color);
         }
@@ -90,15 +92,23 @@ class camera {
         return vec3(random_double() - 0.5, random_double() - 0.5, 0);
     }
     
-    color ray_color(const ray& r, const hittable& world/*这是一个抽象的接口，代表场景中的所有物体集合（hittable_list类）*/) {
-    hit_record rec;//交点坐标、法向量normal、t值
-    if (world.hit(r, interval(0, infinity), rec)/*指定t范围内判定是否相交的函数*/) {
-        return 0.5 * (rec.normal/*单位法向量*/ + color(1,1,1));
-    }
+    color ray_color(const ray& r, int depth, const hittable& world/*这是一个抽象的接口，代表场景中的所有物体集合（hittable_list类）*/) {
+        // If we've exceeded the ray bounce limit, no more light is gathered.
+        if (depth <= 0)
+            return color(0,0,0);
+        
+        hit_record rec;//交点坐标、法向量normal、t值
 
-    vec3 unit_direction = unit_vector(r.direction());
-    auto a = 0.5*(unit_direction.y() + 1.0);
-    return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+        if (world.hit(r, interval(0, infinity), rec)/*指定t范围内判定是否相交的函数*/) {
+            //vec3 direction = random_on_hemisphere(rec.normal);
+            vec3 direction = rec.normal + random_unit_vector();//朗博反射
+            return albedo * ray_color(ray(rec.p, direction), depth-1, world);//产生灰色的效果（每经历一次反射则收集该点反射的一半光线，并且使得反弹次数-1）
+            //return 0.5 * (rec.normal/*单位法向量*/ + color(1,1,1));//依据法向量渲染颜色
+        }
+
+        vec3 unit_direction = unit_vector(r.direction());
+        auto a = 0.5*(unit_direction.y() + 1.0);
+        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
 }
 
 };
