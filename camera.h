@@ -4,6 +4,7 @@
 #include "hittable.h"
 #include "color.h"
 #include "rtweekend.h"
+#include "material.h"
 
 #include <fstream>
 
@@ -14,13 +15,13 @@ class camera {
     int     image_width = 400;
     int     samples_per_pixel = 10;   // Count of random samples for each pixel
     int     max_depth         = 10;   // Maximum number of ray bounces into scene
-    double  albedo            = 0.1;  // ρ
+    double  albedo            = 0.5;  // ρ
 
     void render(const hittable& world) {
         initialize();
 
         std::ofstream ppm;
-        ppm.open("./build/gray_ball_depthlimit_Lambert_gamma_dark.ppm");//在第一次向文件输出之前打开文件///////////////////////////////////////////////////////////////
+        ppm.open("./build/balls_with_material.ppm");//在第一次向文件输出之前打开文件///////////////////////////////////////////////////////////////
         ppm << "P3" << std::endl << image_width << ' ' << image_height << std::endl << "255" << std::endl;
         for (int j = 0; j < image_height; j++) {
             std::cout << "Scanlines remaining: " << (image_height - j) << std::endl;
@@ -99,11 +100,15 @@ class camera {
         
         hit_record rec;//交点坐标、法向量normal、t值
 
-        if (world.hit(r, interval(0, infinity), rec)/*指定t范围内判定是否相交的函数*/) {
+        if (world.hit(r, interval(0.001, infinity), rec)/*指定t范围内判定是否相交的函数*/) {
             //vec3 direction = random_on_hemisphere(rec.normal);
-            vec3 direction = rec.normal + random_unit_vector();//朗博反射
-            return albedo * ray_color(ray(rec.p, direction), depth-1, world);//产生灰色的效果（每经历一次反射则收集该点反射的一半光线，并且使得反弹次数-1）
-            //return 0.5 * (rec.normal/*单位法向量*/ + color(1,1,1));//依据法向量渲染颜色
+            //vec3 direction = rec.normal + random_unit_vector();//朗博反射
+            //return albedo * ray_color(ray(rec.p, direction), depth-1, world);//产生灰色的效果（每经历一次反射则收集该点反射的一半光线，并且使得反弹次数-1）
+            ray scattered;
+            color attenuation;
+            if (rec.mat->scatter(r, rec, attenuation, scattered))
+                return attenuation * ray_color(scattered, depth-1, world);
+            return color(0,0,0);
         }
 
         vec3 unit_direction = unit_vector(r.direction());

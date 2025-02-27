@@ -6,7 +6,12 @@
 
 class sphere : public hittable/*继承，基于模板进行增改，或是采用不同的实现。public表示公用继承，保留其中的public和private。*/ {
   public:/*可以从外面访问的*/
-    sphere(const point3& center, double radius) : center(center), radius(std::fmax(0,radius)) {}
+    //sphere(const point3& center, double radius) : center(center), radius(std::fmax(0,radius)) {}
+    //sphere(const point3& center, double radius) : center(center), radius(std::fmax(0,radius)) {}
+        // TODO: Initialize the material pointer `mat`.
+    
+    sphere(const point3& center, double radius, shared_ptr<material> mat)
+      : center(center), radius(std::fmax(0,radius)), mat(mat) {}//加入材质的初始化
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         vec3 oc = center - r.origin();
@@ -32,6 +37,7 @@ class sphere : public hittable/*继承，基于模板进行增改，或是采用
         rec.p = r.at(rec.t);
         vec3 outward_normal = (rec.p - center) / radius;//这个布尔值表示交点是否位于物体的“正面”。
         rec.set_face_normal(r, outward_normal);
+        rec.mat = mat;
 
         return true;
     }
@@ -39,6 +45,7 @@ class sphere : public hittable/*继承，基于模板进行增改，或是采用
   private:/*只在内部提供接口修改，无法在外部文件和继承类文件访问和修改*/
     point3 center;
     double radius;
+    shared_ptr<material> mat;
 };
 
 #endif
