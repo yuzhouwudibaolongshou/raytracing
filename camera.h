@@ -21,7 +21,7 @@ class camera {
         initialize();
 
         std::ofstream ppm;
-        ppm.open("./build/balls_with_material_fuzzy.ppm");//在第一次向文件输出之前打开文件///////////////////////////////////////////////////////////////
+        ppm.open("./build/glass_ball.ppm");//在第一次向文件输出之前打开文件///////////////////////////////////////////////////////////////
         ppm << "P3" << std::endl << image_width << ' ' << image_height << std::endl << "255" << std::endl;
         for (int j = 0; j < image_height; j++) {
             std::cout << "Scanlines remaining: " << (image_height - j) << std::endl;
@@ -106,7 +106,7 @@ class camera {
             //return albedo * ray_color(ray(rec.p, direction), depth-1, world);//产生灰色的效果（每经历一次反射则收集该点反射的一半光线，并且使得反弹次数-1）
             ray scattered;
             color attenuation;
-            if (rec.mat->scatter(r, rec, attenuation, scattered))
+            if (rec.mat->scatter(r, rec, attenuation, scattered))//？
                 return attenuation * ray_color(scattered, depth-1, world);
             return color(0,0,0);
         }

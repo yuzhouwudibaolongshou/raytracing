@@ -145,4 +145,11 @@ inline vec3 reflect(const vec3& v, const vec3& n) {
     return v - 2*dot(v,n)*n;
 }
 
+inline vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat) {//斯涅尔定律
+    auto cos_theta = std::fmin(dot(-uv, n), 1.0);//uv和n都是单位向量
+    vec3 r_out_perp =  etai_over_etat * (uv + cos_theta*n);//R′⊥=η/η′*(R+cosθn)
+    vec3 r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_perp.length_squared())) * n;//R′∥=−sqrt(1−|R′⊥|^2*n)
+    return r_out_perp + r_out_parallel;
+}
+
 #endif

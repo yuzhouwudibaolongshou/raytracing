@@ -17,7 +17,7 @@ int main() {
     auto material_center = make_shared<lambertian>(color(0.1, 0.2, 0.5));
     //auto material_left   = make_shared<metal>(color(0.8, 0.8, 0.8));
     //auto material_right  = make_shared<metal>(color(0.8, 0.6, 0.2));
-    auto material_left   = make_shared<metal>(color(0.8, 0.8, 0.8), 0.3);
+    auto material_left   = make_shared<dielectric>(1.50);
     auto material_right  = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);//加上了毛金属系数（可以理解为镜面反射与散射之比，算是这两者的“菲涅尔项”）
 
     //world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
