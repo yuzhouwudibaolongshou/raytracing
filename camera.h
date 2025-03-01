@@ -21,7 +21,7 @@ class camera {
         initialize();
 
         std::ofstream ppm;
-        ppm.open("./build/glass_ball.ppm");//在第一次向文件输出之前打开文件///////////////////////////////////////////////////////////////
+        ppm.open("./build/glass_ball_YN.ppm");//在第一次向文件输出之前打开文件///////////////////////////////////////////////////////////////
         ppm << "P3" << std::endl << image_width << ' ' << image_height << std::endl << "255" << std::endl;
         for (int j = 0; j < image_height; j++) {
             std::cout << "Scanlines remaining: " << (image_height - j) << std::endl;

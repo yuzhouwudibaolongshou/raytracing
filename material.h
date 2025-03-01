@@ -57,7 +57,7 @@ class metal : public material {
 
 class dielectric : public material {
   public:
-    dielectric(double refraction_index) : refraction_index(refraction_index) {}
+    dielectric(double refraction_index) : refraction_index(refraction_index) {}//？
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
     const override {
@@ -65,9 +65,22 @@ class dielectric : public material {
         double ri = rec.front_face ? (1.0/refraction_index) : refraction_index;
 
         vec3 unit_direction = unit_vector(r_in.direction());
-        vec3 refracted = refract(unit_direction, rec.normal, ri);
+        //vec3 refracted = refract(unit_direction, rec.normal, ri);//这个步骤需要判定光线是否折射，因为材料的反射率与观察角度有关，即与ray和法线夹角有关。
+        double cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0);
+        double sin_theta = std::sqrt(1.0 - cos_theta*cos_theta);
 
-        scattered = ray(rec.p, refracted);
+        bool cannot_refract = ri * sin_theta > 1.0;
+        vec3 direction;
+
+        if (cannot_refract || reflectance(cos_theta, ri) > random_double())
+            direction = reflect(unit_direction, rec.normal);
+        else
+            direction = refract(unit_direction, rec.normal, ri);
+
+        //scattered = ray(rec.p, refracted);//那么原本的散射关系也需要变化
+        scattered = ray(rec.p/*记录下的hit点*/, direction);
+
+        
         return true;
     }
 
@@ -75,6 +88,13 @@ class dielectric : public material {
     // Refractive index in vacuum or air, or the ratio of the material's refractive index over
     // the refractive index of the enclosing media
     double refraction_index;
+
+    static double reflectance(double cosine, double refraction_index) {
+        // Use Schlick's approximation for reflectance.
+        auto r0 = (1 - refraction_index) / (1 + refraction_index);
+        r0 = r0*r0;
+        return r0 + (1-r0)*std::pow((1 - cosine),5);
+    }//Schlick 近似
 };
 
 #endif

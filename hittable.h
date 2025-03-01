@@ -18,7 +18,7 @@ class hit_record {
         // NOTE: the parameter `outward_normal` is assumed to have unit length.
 
         front_face = dot(r.direction(), outward_normal) < 0;
-        normal = front_face ? outward_normal : -outward_normal;//这个布尔值表示交点是否位于物体的“正面”。
+        normal = front_face ? outward_normal : -outward_normal;//这个布尔值表示交点是否位于物体的“正面”。当射线ray和法线的点乘小于0时为在同一面
     }
 };
 
