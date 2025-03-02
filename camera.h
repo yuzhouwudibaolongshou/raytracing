@@ -17,11 +17,16 @@ class camera {
     int     max_depth         = 10;   // Maximum number of ray bounces into scene
     double  albedo            = 0.5;  // ρ
 
+    double vfov = 90;  // Vertical view angle (field of view)视角
+    point3 lookfrom = point3(0,0,0);   // Point camera is looking from
+    point3 lookat   = point3(0,0,-1);  // Point camera is looking at
+    vec3   vup      = vec3(0,1,0);     // Camera-relative "up" direction用来控制相机平面内的旋转
+
     void render(const hittable& world) {
         initialize();
 
         std::ofstream ppm;
-        ppm.open("./build/glass_ball_empty.ppm");//在第一次向文件输出之前打开文件///////////////////////////////////////////////////////////////
+        ppm.open("./build/ball_glass_empty_cameratest.ppm");//在第一次向文件输出之前打开文件///////////////////////////////////////////////////////////////
         ppm << "P3" << std::endl << image_width << ' ' << image_height << std::endl << "255" << std::endl;
         for (int j = 0; j < image_height; j++) {
             std::cout << "Scanlines remaining: " << (image_height - j) << std::endl;
@@ -45,6 +50,7 @@ class camera {
     point3 pixel00_loc;    // Location of pixel 0, 0
     vec3   pixel_delta_u;  // Offset to pixel to the right
     vec3   pixel_delta_v;  // Offset to pixel below
+    vec3   u, v, w;              // Camera frame basis vectors
 
     void initialize() {
         image_height = int(image_width / aspect_ratio);
@@ -52,25 +58,40 @@ class camera {
 
         pixel_samples_scale = 1.0 / samples_per_pixel;
 
-        center = point3(0, 0, 0);
+        //center = point3(0, 0, 0);
+        center = lookfrom;
 
         // Determine viewport dimensions.
-        auto focal_length = 1.0;
-        auto viewport_height = 2.0;
+        //auto focal_length = 1.0;
+        auto focal_length = (lookfrom - lookat).length();
+
+        //auto viewport_height = 2.0;
+        //我们可以在任意距离构建viewport，只要保证其尺寸与相机的视角宽度成比例。
+        auto theta = degrees_to_radians(vfov);
+        auto h = std::tan(theta/2);
+        auto viewport_height = 2 * h * focal_length;
         auto viewport_width = viewport_height * (double(image_width)/image_height);
 
+        // Calculate the u,v,w unit basis vectors for the camera coordinate frame.
+        w = unit_vector(lookfrom - lookat); //指向相机
+        u = unit_vector(cross(vup, w));     //视角左右
+        v = cross(w, u);                    //视角上下
+
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        auto viewport_u = vec3(viewport_width, 0, 0);
-        auto viewport_v = vec3(0, -viewport_height, 0);
+        //auto viewport_u = vec3(viewport_width, 0, 0);
+        //auto viewport_v = vec3(0, -viewport_height, 0);
+        vec3 viewport_u = viewport_width * u;    // Vector across viewport horizontal edge
+        vec3 viewport_v = viewport_height * -v;  // Vector down viewport vertical edge
+        //更新后的uv向量，此时不一定与xy平行
 
         // Calculate the horizontal and vertical delta vectors from pixel to pixel.
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height;
 
         // Calculate the location of the upper left pixel.
-        auto viewport_upper_left =
-            center - vec3(0, 0, focal_length) - viewport_u/2 - viewport_v/2;
-        pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+        //auto viewport_upper_left =center - vec3(0, 0, focal_length) - viewport_u/2 - viewport_v/2;
+        auto viewport_upper_left = center - (focal_length * w) - viewport_u/2 - viewport_v/2;//viewport左上角对应的xzy点
+        pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);//左上角第一个像素中心点
     }
 
     ray get_ray(int i, int j) const {
