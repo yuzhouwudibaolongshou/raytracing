@@ -8,11 +8,14 @@ class material {
     virtual ~material() = default;
 
     virtual bool scatter(
-        const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+        const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered  
     ) const {
         return false;
     }
 };
+/*const xx&是常引用，可以在小函数中完成对大函数的常数的访问，但不能进行任何修改，如果传比较复杂的类型，需要用到传常引用
+  xx 传值会先复制一份，此时可以对其中的数据进行修改，但不会修改调用该函数的函数中的变量值，一般用于简单的类型
+  xx& 传引用，允许调用函数时修改外层函数的变量，当需要多个返回值的时候，一般使用该方式。比如上述函数不但返回了是否散射，也返回了散射视线与反射率*/
 
 class lambertian : public material {
   public:

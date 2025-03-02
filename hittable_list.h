@@ -13,7 +13,7 @@ using std::shared_ptr;
 class hittable_list : public hittable {
   public:
     std::vector<shared_ptr<hittable>> objects;
-    //用一个objects（std::vector）存储所有可以被射线击中的物体。每个物体都是shared_ptr<hittable>高级指针类型，使用shared_ptr管理内存可以避免手动释放内存的问题。
+    //用一个objects（std::vector）存储所有可以被射线击中的物体。每个物体都是shared_ptr<hittable>高级指针类型（创建的模板类），使用shared_ptr管理内存可以避免手动释放内存的问题。
 
     hittable_list() {}
     hittable_list(shared_ptr<hittable> object) { add(object); }
