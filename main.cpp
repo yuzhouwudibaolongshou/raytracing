@@ -21,7 +21,7 @@ int main() {
     //auto material_left   = make_shared<dielectric>(1.00 / 1.33);//此时为两个材料的折射率。这会被用来判断是否折射
     auto material_left   = make_shared<dielectric>(1.50);
     auto material_bubble = make_shared<dielectric>(1.00 / 1.50);//在玻璃球内部实现一个空气球，此时界面处的折射率之比为“1/1.5”
-    auto material_right  = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);//加上了毛金属系数（可以理解为镜面反射与散射之比，算是这两者的“菲涅尔项”）
+    auto material_right  = make_shared<metal>(color(0.8, 0.6, 0.2), 0.1);//加上了毛金属系数（可以理解为镜面反射与散射之比，算是这两者的“菲涅尔项”）
 
     //world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
     //world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
@@ -39,11 +39,13 @@ int main() {
     cam.samples_per_pixel = 100;
     cam.max_depth         = 50;
 
-    cam.vfov = 90;  //相机视角宽度
+    cam.vfov = 20;  //相机视角宽度
     cam.lookfrom = point3(-2,2,1);
     cam.lookat   = point3(0,0,-1);
     cam.vup      = vec3(0,1,0);
 
+    cam.defocus_angle = 10.0;
+    cam.focus_dist    = 3.4;
 
     cam.render(world);
 }
